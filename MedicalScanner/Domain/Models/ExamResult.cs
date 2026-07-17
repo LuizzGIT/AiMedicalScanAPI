@@ -2,7 +2,7 @@ using System;
 
 public class ExameResult
 {
-    public Guid idExame {get; set;}
+    public Guid IdExame {get; set;}
 
     public ExamType TipoExame {get; set;}
 
