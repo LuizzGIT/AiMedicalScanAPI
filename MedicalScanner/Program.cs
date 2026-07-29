@@ -33,7 +33,6 @@ if (app.Environment.IsDevelopment())
 // endpoint do arquivo 
 app.MapPost("/api/diagnosticos", async (
     IFormFile imagem,
-    [FromForm] ExamType tipoExame,
     IExamService examService) =>
 {
     if (imagem == null || imagem.Length == 0)
@@ -44,7 +43,7 @@ app.MapPost("/api/diagnosticos", async (
 
     try
     {
-        var resultado = await examService.AnalisarExameAsync(stream, tipoExame);
+        var resultado = await examService.AnalisarExameAsync(stream);
         return Results.Ok(resultado);
     }
     catch (Exception ex)
