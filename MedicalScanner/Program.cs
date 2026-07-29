@@ -1,44 +1,57 @@
+using MedicalScanner.Application.Services;
+using MedicalScanner.Domain.Interfaces;
+using MedicalScanner.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.IO;
+// using MedicalScanner.Domain.Interfaces;
+// using MedicalScanner.Application.Services;
+// using MedicalScanner.Domain.Enums;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Injeção de Dependências (CORRIGIDO PARA O OLLAMA)
+builder.Services.AddScoped<IAiRepository, AiRepository>();
+builder.Services.AddScoped<IExamService, ExamService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+// endpoint do arquivo 
+app.MapPost("/api/diagnosticos", async (
+    IFormFile imagem,
+    [FromForm] ExamType tipoExame,
+    IExamService examService) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    if (imagem == null || imagem.Length == 0)
+        return Results.BadRequest(new { Erro = "Imagem inválida." });
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    // Pega o fluxo de dados puro, sem converter para Base64
+    using var stream = imagem.OpenReadStream();
+
+    try
+    {
+        var resultado = await examService.AnalisarExameAsync(stream, tipoExame);
+        return Results.Ok(resultado);
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { Erro = ex.Message });
+    }
 })
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+.DisableAntiforgery();
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

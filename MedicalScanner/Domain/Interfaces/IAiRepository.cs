@@ -1,6 +1,6 @@
-using System.Threading.Tasks;
+namespace MedicalScanner.Domain.Interfaces;
 
 public interface IAiRepository
 {
-    Task<string> AnalisarImagemAsync(string base64Image, ExamType tipoExame);
+    IAsyncEnumerable<string> AnalyzeImageStreamAsync(string prompt, byte[] imageBytes);
 }
