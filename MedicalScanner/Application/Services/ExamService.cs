@@ -19,8 +19,10 @@ public class ExamService : IExamService
         var imageBytes = memoryStream.ToArray();
  
         //  Prompt em inglês simples, pois portugues não funciona
-        var prompt = "Describe the visual content of this medical exam image in detail. " +
-                     "Include visible patterns, lines, numbers, text, and graphical elements.";
+       var prompt = "Look carefully at every detail in this medical exam image. " +
+             "Describe everything you can see: all numbers, measurements, labels, " +
+             "wave patterns, line shapes, colors, scales, axes, and any text visible. " +
+             "Be as detailed and specific as possible.";
  
         //  Chama o repositório
         var resultStream = _aiRepository.AnalyzeImageStreamAsync(prompt, imageBytes);

@@ -13,6 +13,16 @@ using System.IO;
 // using MedicalScanner.Domain.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
+// para erro de Cors
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -23,6 +33,8 @@ builder.Services.AddScoped<IAiRepository, AiRepository>();
 builder.Services.AddScoped<IExamService, ExamService>();
 
 var app = builder.Build();
+app.UseCors("FrontendDev"); 
+
 
 if (app.Environment.IsDevelopment())
 {

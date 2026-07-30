@@ -10,7 +10,7 @@ public class AiRepository : IAiRepository
 
     public AiRepository()
     {
-        // 1. Crie um HttpClient customizado
+        // Crie um HttpClient customizado
         var httpClient = new HttpClient()
         {
             BaseAddress = new Uri("http://localhost:11434"),
@@ -18,7 +18,7 @@ public class AiRepository : IAiRepository
             Timeout = TimeSpan.FromMinutes(10) 
         };
 
-        // 3. Passe o httpClient para o OllamaApiClient
+        // Passe o httpClient para o OllamaApiClient
         _ollamaClient = new OllamaApiClient(httpClient);
         
         _ollamaClient.SelectedModel = "moondream";
